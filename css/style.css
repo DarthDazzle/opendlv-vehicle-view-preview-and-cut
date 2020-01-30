@@ -1,0 +1,134 @@
+.previewWindow {
+    width:90%;
+    left:5%;
+    background-color: darkgray;
+    position: fixed;
+    bottom: 0;
+    border-top: 5px solid #28352A;
+    border-right: 5px solid #28352A;
+    border-left: 5px solid #28352A;
+    border-radius: 40px 40px 0px 0px;
+}
+
+.videoViewer{
+    
+    margin:8px;
+    text-align: center;
+}
+
+#video{
+  border: 3px solid #28352A;
+  background-color: black;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+  }
+  
+  /* Dropdown Content (Hidden by Default) */
+  .dropdown-content {
+    display: none;
+    position: absolute;
+
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+  }
+  
+  /* Links inside the dropdown */
+  .dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+  }
+  
+  /* Change color of dropdown links on hover */
+  .dropdown-content a:hover {background-color: #ddd;}
+  
+  /* Show the dropdown menu on hover */
+  .dropdown:hover .dropdown-content {display: block;}
+  
+  /* Change the background color of the dropdown button when the dropdown content is shown */
+  .dropdown:hover .dropbtn {background-color: #3e8e41;}
+
+
+  .progBar {
+    position: relative;
+    height:20px;
+    width:10%;
+    background-color: blue;
+  }
+
+  .progressBar {
+    position: relative;
+    background-color: rgb(77, 77, 77);
+  }
+
+  .timeStamp {
+    position: absolute;
+    display: none;
+    text-align: right;
+
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 100;
+  }
+
+  .progressBar:hover .timeStamp {
+    display: block !important;
+    background-color: rgb(167, 167, 167);
+  }
+
+
+  .custom-menu {
+    display: none;
+    z-index: 1000;
+    position: absolute;
+    overflow: hidden;
+    border: 1px solid #CCC;
+    white-space: nowrap;
+    font-family: sans-serif;
+    background: #FFF;
+    color: #333;
+    border-radius: 5px;
+    padding: 0;
+}
+
+/* Each of the items in the list */
+.custom-menu li {
+    padding: 8px 12px;
+    cursor: pointer;
+    list-style-type: none;
+    transition: all .3s ease;
+    user-select: none;
+}
+
+.custom-menu li:hover {
+    background-color: #DEF;
+}
+
+#inMarkerBG {
+  position: absolute;
+  opacity: 0.5;
+  color: #333;
+  z-index : 10;
+  position : absolute;
+  top : 0;
+  left : 0;
+}
+
+#inMarker {
+  opacity: 1;
+  position: absolute;
+  font-size: 30px;
+  top: -20px;
+  left: -9px;
+}
+
+#outMarker {
+  opacity: 1;
+  position: absolute;
+  font-size: 30px;
+  top: -20px;
+  right: -9px;
+}
