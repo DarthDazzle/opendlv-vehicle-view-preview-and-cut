@@ -48,7 +48,8 @@ var markerPos = 0;
 var inMarker = new Date(0 * 1000).toISOString().substr(11, 8);
 var outMarker = new Date(10000000 * 1000).toISOString().substr(11, 8);
 var mapCreated = false;
-var sourcename = ""
+var sourcename = "";
+var path = "";
 
 function cutFile() {
     var a = $('#sTime').val().split(':'); // split it at the colons
@@ -65,7 +66,7 @@ function cutFile() {
                             'Accept': 'application/json, text/plain, */*',
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({recordingFileToCut: sourcename, startTime: sTimePer, length: len, outName: fileName})
+                        body: JSON.stringify({recordingFileToCut: path, startTime: sTimePer, length: len, outName: fileName})
                     }
     )
     .then(function(response) {
@@ -92,13 +93,12 @@ vid.addEventListener("timeupdate", function() {
     
 })
 
-function eachLayer(layer){
 
-}
 
 function readURL(input, filePath) {
     var pathTest = '/' + filePath.split('/').slice(3, -1).join('/') + input ;
     preview.style.display = "block";
+    path = pathTest;
     source.src = pathTest + '.mp4';
     //namer.innerHTML = input
     namer.val(input);

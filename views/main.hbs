@@ -394,12 +394,6 @@ function genFile(filename) {
   <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
    <!-- <button id="back" type="button" class="fas fa-arrow-left" style="font-size:20px;color:#555;padding: 5px 30px;" onclick="location.href='..'"> --->
   </nav>
- 
- <!-- Preview Window, here the files are displayed with video and map, and allows the user to cut the file to desired length.
-  #TODO 
-  * Fix cut to cut from videotime.
- 
-  --->
   <div id="previewWindow" style = "display: none;"class="previewWindow">
       <table style="width: 100%;">
           <tr>
@@ -508,9 +502,15 @@ function genFile(filename) {
               <button id="generate" type="button" class="fas fa-bolt" style="font-size:15px;color:#555;padding: 5px 20px;" onclick="genFile('{{filename}}')" title="Generate {{name}}"></button>
               {{/if}}
               </td>
+              {{#if userFile}}
+              <td align="left">
+              <div onclick="location.href = '../detailsUser?rec={{name}}.rec'" onmouseover="" style="cursor: pointer;">{{name}}</div>
+              </td>
+              {{else}}
               <td align="left">
               <div onclick="location.href = '../details?rec={{name}}.rec'" onmouseover="" style="cursor: pointer;">{{name}}</div>
               </td>
+              {{/if}}
               <td align="right">
               {{size}} bytes
               </td>

@@ -208,6 +208,40 @@ app.get("/details", function(req, res) {
     res.render('details', details);
 });
 
+app.get("/detailsUser", function(req, res) {
+    var hasExternallySuppliedODVDFile = fs.existsSync("./external.odvd");
+    // Extract meta data from a rec-file.
+    var output = "";
+    try {
+        output = execSync('if [ -f external.odvd ]; then rec-metadataToJSON --rec=./recordingsUser/' + req.query.rec + ' --odvd=./external.odvd 2>/dev/null; else rec-metadataToJSON --rec=./recordingsUser/' + req.query.rec + ' --odvd=./opendlv-standard-message-set-v0.9.9.odvd 2>/dev/null; fi', { shell: '/bin/bash' }).toString();
+    }
+    catch (e) {}
+
+    output = output.trim();
+    console.log("Extracted meta data: '" + output + "'"); // Expected: { "attributes": [ { "key": "keyA", "value":"valueA"} ] }
+
+    var details = {
+        hasODVD: hasExternallySuppliedODVDFile,
+        name: req.query.rec,
+        filename: './recordingsUser/' + req.query.rec
+    };
+
+    // Concatenate meta data.
+    if ( ('{' == output[0]) && ('}' == output[output.length-1]) ) {
+        details = Object.assign(details, JSON.parse(output));
+
+        var size = fs.statSync(path.join('./recordingsUser/' + req.query.rec)).size;
+        size = addThousandsSeparator(size);
+        details.fileInformation.push({
+            "key"       : "size:",
+            "value"     : size + " bytes"
+        });
+    }
+
+    // Return details page.
+    res.render('details', details);
+});
+
 //------------------------------------------------------------------------------
 // Handle POST requests.
 var bodyParser = require('body-parser');
@@ -331,12 +365,12 @@ app.post('/cutfile', (req, res) => {
     ffmp_startTime = '' + Math.floor(g_startTime/60/60) +':' + Math.floor(g_startTime/60) + ':' + g_startTime;
     ffmp_length = '' + Math.floor(g_length/60/60) +':' + Math.floor(g_length/60) + ':' + g_length;
     g_name = req.body.outName;
-    cmd = '/opt/vehicle-view/cut/rec_splitter ' + '/opt/vehicle-view/recordings/' + g_fileToReplay + '.rec ' + g_name + ' ' + g_startTime + ' ' + g_length;
+    cmd = '/opt/vehicle-view/cut/rec_splitter .' + g_fileToReplay + '.rec ' + g_name + ' ' + g_startTime + ' ' + g_length;
     
 // PythonCut    g_cluonreplay = exec('python3 /opt/vehicle-view/cut/rec-file-splitter/python3/rec_splitter.py -r ' + '/opt/vehicle-view/recordings/' + g_fileToReplay + ' -s ' + g_startTime + ' -i' + g_length);
     g_cluoncut = exec(cmd, function callback(error, stdout, stderr) {
     });
-    cmd = 'ffmpeg -i ./recordings/' + g_fileToReplay + '.mp4 -ss ' + ffmp_startTime + ' -t ' + ffmp_length + ' ./recordingsUser/' + g_name + '.mp4';
+    cmd = 'ffmpeg -i .' + g_fileToReplay + '.mp4 -ss ' + ffmp_startTime + ' -t ' + ffmp_length + ' ./recordingsUser/' + g_name + '.mp4';
     console.log(cmd);
     g_mp4cut = exec(cmd, function callback(error, stdout, stderr){
         res.send ({
