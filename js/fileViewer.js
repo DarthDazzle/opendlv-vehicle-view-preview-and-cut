@@ -26,7 +26,6 @@ function statecheck(name,filePath) {
 }
 
 function loadMap(name, pathTest) {
-    document.getElementById("demo").innerHTML = pathTest;
     map = L.map('mapid');
     L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: 'Map data &copy; <a href="http://www.osm.org">OpenStreetMap</a>'

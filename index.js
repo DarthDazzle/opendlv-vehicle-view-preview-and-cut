@@ -115,6 +115,13 @@ app.get("/", function(req, res) {
     const recordingsFolderVM = '/opt/vehicle-view/recordingsVM/';
     const recordingsFolderUser = '/opt/vehicle-view/recordingsUser/';
     var files = { hasODVD: hasExternallySuppliedODVDFile, isX64: isX64, recfiles: [] };
+    var generate = 1
+    fs.access('./recordings/',fs.constants.W_OK, err => {
+        if (err){
+            generate = 0;
+        }
+    })
+    
     fs.readdirSync(recordingsFolder).forEach(file => {
         var size = 0;
         var file_name = file.split('.',1);
@@ -126,7 +133,8 @@ app.get("/", function(req, res) {
                 "filename"  : recordingsFolder + "/" + file_name +'.rec',
                 "size"      : size,
                 "inVM"      : 0,
-                "userFile"  : 0
+                "userFile"  : 0,
+                "generate"  : generate
             });
         }
         
@@ -142,7 +150,8 @@ app.get("/", function(req, res) {
                 "filename"  : recordingsFolderUser + "/" + file_name +'.rec',
                 "size"      : size,
                 "inVM"      : 0,
-                "userFile"  : 1
+                "userFile"  : 1,
+                "generate"  : 0
             });
         }
         
@@ -153,7 +162,6 @@ app.get("/", function(req, res) {
         if (file.split('.').pop() == "rec") {
             files.recfiles.forEach((recFile) => {
                 var res = recFile['name'].toString().localeCompare(file_name)
-                console.log(res)
                 if (res == 0)
                 {
                     recFile.inVM = 1
@@ -287,7 +295,7 @@ app.post('/unlinkFiles',(req,res) => {
 });
 
 app.post('/convertrec2webm', (req, res) => {
-    var process_cluonrec2webm = execSync('if [ "$(docker images -q chalmersrevere/rec2csv-png:v0.0.4 2> /dev/null)" == "" ];then docker build -t chalmersrevere/rec2csv-png:v0.0.4 https://github.com/chalmers-revere/rec2csv-png.git; fi && rm -f ' + req.body.recordingFile + '.webm.zip && mkdir -p recordings/tmp && if [ -f external.odvd ]; then cp external.odvd recordings/tmp/messages.odvd; else cp opendlv-standard-message-set-v0.9.9.odvd recordings/tmp/messages.odvd; fi && docker run --rm --volumes-from=test_env -w /opt/vehicle-view/recordings/tmp chalmersrevere/rec2csv-png:v0.0.4 --rec=../' + req.body.recordingFile + ' --odvd=messages.odvd && docker run --rm --volumes-from=test_env -w /opt/vehicle-view/recordings/tmp --entrypoint="" chalmersrevere/rec2csv-png:v0.0.4 /usr/bin/generate_webm.sh && cd recordings/tmp && zip -r9 ../../' + req.body.recordingFile + '.webm.zip *.webm && cd .. && rm -fr tmp && cd ..', { shell: '/bin/bash' });
+    var process_cluonrec2webm = execSync('if [ "$(docker images -q chalmersrevere/rec2csv-png:v0.0.4 2> /dev/null)" == "" ];then docker build -t chalmersrevere/rec2csv-png:v0.0.4 https://github.com/chalmers-revere/rec2csv-png.git; fi && rm -f ' + req.body.recordingFile + '.webm.zip && mkdir -p recordings/tmp && if [ -f external.odvd ]; then cp external.odvd recordings/tmp/messages.odvd; else cp opendlv-standard-message-set-v0.9.9.odvd recordings/tmp/messages.odvd; fi && docker run --rm --volumes-from=rec-preview -w /opt/vehicle-view/recordings/tmp chalmersrevere/rec2csv-png:v0.0.4 --rec=../' + req.body.recordingFile + '.rec --odvd=messages.odvd && docker run --rm --volumes-from=rec-preview -w /opt/vehicle-view/recordings/tmp --entrypoint="" chalmersrevere/rec2csv-png:v0.0.4 /usr/bin/generate_webm.sh && cd recordings/tmp && zip -r9 ../../' + req.body.recordingFile + '.webm.zip *.webm && cd .. && rm -fr tmp && cd ..', { shell: '/bin/bash' });
 
     console.log(process_cluonrec2webm.toString());
 
@@ -341,6 +349,21 @@ app.post('/cutfile', (req, res) => {
     console.log('Stated splitting: ' + g_mp4cut.pid);
 
     
+});
+
+app.post('/create_gpx', (req, res) => {
+    g_fileToGenGPX = req.body.recordingFileToGenGPX;
+    g_duration = req.body.length;
+    cmd = '/opt/vehicle-view/cut/gpx_creator ' + g_fileToGenGPX ;
+    console.log(cmd);
+    g_genGPX = exec(cmd, function callback(error, stdout, stderr){
+        res.send ({
+            status      : "200",
+            responseType: "string",
+            response    : "success"
+    });
+});
+console.log('Stated splitting: ' + g_genGPX.pid);
 });
 
 app.post('/endreplay', (req, res) => {
